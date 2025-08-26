@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">RateNewDev</string>
+    <string name="rate_message_df">Phản hổi mẹ mày đi</string>
+
+    <string name="rate_message_1">Rất tệ, mình không hài lòng</string>
+    <string name="rate_message_2">Chưa ổn lắm</string>
+    <string name="rate_message_3">Cũng được</string>
+    <string name="rate_message_4">Khá tốt, mình thích</string>
+    <string name="rate_message_5">Tuyệt vời! Rất hài lòng</string>
+
+    <string name="feedback_reason_good">Ứng dụng hay</string>
+    <string name="feedback_reason_crash">Ứng dụng hay bị crash</string>
+    <string name="feedback_reason_missing_feature">Thiếu tính năng tôi cần</string>
+    <string name="btn_rate_selected">OK</string>
+    <string name="btn_rate_unselected">Đánh giá ngay</string>
+</resources>
