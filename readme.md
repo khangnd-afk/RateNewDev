@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        RateUtils.init(application)
+        RateUtils.init(application) // Hoặc this.application nếu trong Activity
     }
 }
 ```
@@ -71,50 +71,94 @@ RateUtils.showFeedback(this)
 // RateUtils.showFeedback(this, isShowNow = true)
 ```
 
-## 4. Cấu hình (thông qua RateUtils)
+## 4. Cấu hình Chi tiết (thông qua RateUtils)
 
 `RateUtils.kt` cung cấp một phương thức `buildConfig()` nơi một đối tượng `RateConfig` được tạo. Bạn có thể sửa đổi phương thức này để tùy chỉnh hành vi và giao diện của hộp thoại đánh giá và phản hồi.
 
-Các khía cạnh chính bạn có thể cấu hình trong `RateConfig.Builder` (xem `RateConfig.kt` để biết tất cả các tùy chọn):
+Dưới đây là giải thích chi tiết về các tùy chọn cấu hình có sẵn trong `RateConfig.Builder` được sử dụng trong `RateUtils`:
 
-*   `appName`, `packageId`, `supportEmail`
-*   `rateOptions`: Danh sách các thông báo và hình ảnh cho mỗi mức sao.
-*   `feedbackReasons`: Các lý do người dùng có thể chọn trong biểu mẫu phản hồi.
-*   `uiConfig`: Bố cục cho các hộp thoại (`rateLayout`, `feedbackLayout`), các nút.
-*   Điều kiện hiển thị:
-    *   `setMinSession()`: Số phiên tối thiểu trước khi hiển thị.
-    *   `setSessionInterval()`: Số phiên giữa các lần hiển thị.
-    *   `setMinIntervalMillis()`: Thời gian tối thiểu giữa các lần hiển thị.
-    *   `setDisableAfterStars()`: Tắt các lời nhắc trong tương lai nếu người dùng đánh giá cao.
-    *   `setOpenInAppReviewAfterStars()`: Kích hoạt đánh giá trong ứng dụng cho các đánh giá cao.
-    *   `setMaxStarsForFeedback()`: Hiển thị biểu mẫu phản hồi cho các đánh giá thấp.
-
-Đoạn mã ví dụ từ `RateUtils.buildConfig()`:
 ```kotlin
+// bên trong RateUtils.kt
 private fun buildConfig(): RateConfig {
     return RateConfig.Builder(
-        appName = "Rate Example", // Tùy chỉnh tên ứng dụng của bạn
-        packageId = "com.example.app", // Tùy chỉnh ID gói của bạn
-        supportEmail = "support@example.com", // Tùy chỉnh email hỗ trợ của bạn
+        appName = "Rate Example", // Tên ứng dụng của bạn
+        packageId = "com.example.app", // ID gói của ứng dụng
+        supportEmail = "support@example.com", // Email hỗ trợ
         rateOptions = getRateOptions(), // Xem getRateOptions() trong RateUtils
         feedbackReasons = getFeedbackReasons(), // Xem getFeedbackReasons() trong RateUtils
         uiConfig = UiConfig(
-            rateLayout = R.layout.dialog_rate,     // Cung cấp bố cục tùy chỉnh của bạn
-            feedbackLayout = R.layout.dialog_feedback, // Cung cấp bố cục tùy chỉnh của bạn
-            feedbackItemLayout = R.layout.item_feedback, // Cung cấp bố cục tùy chỉnh của bạn
-            buttonRate = getButtonRateConfig(),
-            buttonFeedback = getButtonFeedbackConfig()
+            rateLayout = R.layout.dialog_rate,     // Layout cho dialog đánh giá
+            feedbackLayout = R.layout.dialog_feedback, // Layout cho dialog phản hồi
+            feedbackItemLayout = R.layout.item_feedback, // Layout cho từng mục lý do phản hồi
+            buttonRate = getButtonRateConfig(), // Cấu hình nút trong dialog đánh giá
+            buttonFeedback = getButtonFeedbackConfig() // Cấu hình nút trong dialog phản hồi
         )
     )
-        .setMinSession(3) // Ví dụ: Hiển thị sau 3 phiên
-        .setMinIntervalMillis(7 * 24 * 60 * 60 * 1000L, IntervalType.GLOBAL) // Ví dụ: khoảng thời gian chung 7 ngày
-        .setDisableAfterStars(4) // Ví dụ: Tắt nếu người dùng cho 4 hoặc 5 sao
-        .setOpenInAppReviewAfterStars(4) // Ví dụ: Mở đánh giá trong ứng dụng nếu 4 hoặc 5 sao
-        .setMaxStarsForFeedback(3) // Ví dụ: Hiển thị biểu mẫu phản hồi nếu 1-3 sao
-        .build()
+    // --- Các điều kiện hiển thị và hành vi ---
+
+    // Số phiên (session) tối thiểu người dùng phải mở ứng dụng trước khi hộp thoại đánh giá có thể hiển thị.
+    // Mặc định: 0 (hiển thị ngay trong phiên đầu tiên nếu các điều kiện khác thỏa mãn).
+    .setMinSession(0) 
+
+    // Số phiên cách nhau giữa các lần hiển thị hộp thoại đánh giá.
+    // Ví dụ: nếu đặt là 3, sau khi hiển thị lần đầu (và không bị vô hiệu hóa),
+    // hộp thoại sẽ chỉ có thể hiển thị lại sau 3 phiên nữa.
+    // Mặc định: 0 (có thể hiển thị trong các phiên liên tiếp nếu các điều kiện khác thỏa mãn).
+    .setSessionInterval(0) // Giá trị ví dụ, bạn có thể thay đổi
+
+    // Số lần hiển thị tối đa hộp thoại đánh giá trong một phiên.
+    // Mặc định: không giới hạn (Integer.MAX_VALUE).
+    .setMaxShowPerSession(1) // Giá trị ví dụ, bạn có thể thay đổi
+
+    // Thời gian tối thiểu (tính bằng mili giây) giữa các lần hiển thị hộp thoại.
+    // IntervalType.GLOBAL: Áp dụng trên toàn cục, bất kể ứng dụng được đóng mở.
+    // IntervalType.PER_SESSION: Chỉ áp dụng trong cùng một phiên.
+    // Mặc định: 0 (không có khoảng thời gian tối thiểu).
+    .setMinIntervalMillis(10000, IntervalType.GLOBAL) // Ví dụ: 10 giây
+
+    // Tổng số lần hiển thị tối đa hộp thoại đánh giá trong suốt vòng đời ứng dụng.
+    // Mặc định: không giới hạn (Integer.MAX_VALUE).
+    .setMaxTotalShow(5) // Giá trị ví dụ, bạn có thể thay đổi
+
+    // Tự động vô hiệu hóa việc hiển thị hộp thoại đánh giá nếu người dùng đánh giá từ X sao trở lên.
+    // Ví dụ: nếu đặt là 4, người dùng đánh giá 4 hoặc 5 sao sẽ không thấy hộp thoại nữa.
+    // Mặc định: 0 (không vô hiệu hóa dựa trên số sao).
+    .setDisableAfterStars(4)
+
+    // Loại vô hiệu hóa khi đạt điều kiện setDisableAfterStars.
+    // DisableType.SESSION: Chỉ vô hiệu hóa trong phiên hiện tại.
+    // DisableType.FOREVER: Vô hiệu hóa vĩnh viễn.
+    // Mặc định: DisableType.SESSION.
+    .setDisableType(DisableType.SESSION) // Hoặc DisableType.FOREVER
+
+    // Tự động mở Google In-App Review nếu người dùng đánh giá từ X sao trở lên.
+    // Điều này bỏ qua hộp thoại phản hồi tùy chỉnh nếu có.
+    // Mặc định: 0 (không tự động mở In-App Review).
+    .setOpenInAppReviewAfterStars(4)
+
+    // Số sao tối đa mà khi người dùng chọn, hộp thoại phản hồi sẽ được hiển thị thay vì Google In-App Review (nếu được cấu hình) hoặc hoàn thành.
+    // Ví dụ: nếu đặt là 3, người dùng đánh giá 1, 2, hoặc 3 sao sẽ được chuyển đến màn hình phản hồi.
+    // Mặc định: 3.
+    .setMaxStarsForFeedback(3) // Giá trị ví dụ, bạn có thể thay đổi, thường là thấp hơn setOpenInAppReviewAfterStars
+
+    // Vô hiệu hóa hoàn toàn việc sử dụng Google In-App Review, ngay cả khi các điều kiện khác được đáp ứng.
+    // Mặc định: false.
+    .setDisableOpenInAppReview(false)
+
+    // Điều kiện tùy chỉnh để quyết định có hiển thị hộp thoại đánh giá hay không.
+    // Hàm lambda này sẽ được gọi trước khi hiển thị. Trả về `true` để cho phép hiển thị.
+    // Ví dụ: không hiển thị nếu người dùng đã từng đánh giá (RateManager.isRated).
+    .setCustomShowCondition { !RateManager.isRated }
+
+    // Điều kiện tùy chỉnh để buộc hiển thị hộp thoại, bỏ qua các điều kiện thông thường (phiên, khoảng thời gian).
+    // Hữu ích cho các trường hợp đặc biệt hoặc thử nghiệm.
+    // Mặc định: false.
+    .setForceShowCondition { false } // Ví dụ: { BuildConfig.DEBUG } để luôn hiển thị trong bản debug
+
+    .build()
 }
 ```
-Tham khảo `RateConfig.kt` để biết giải thích chi tiết về từng phương thức builder.
+Tham khảo thêm tệp `RateConfig.kt` và `RateManager.kt` để hiểu rõ hơn về các thuộc tính và hành vi mặc định.
 
 ## 5. Đặt lại để Thử nghiệm
 
