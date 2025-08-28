@@ -60,8 +60,8 @@ private fun buildConfig(): RateConfig {
         rateOptions = getRateOptions(),        // Các option hiển thị theo sao
         feedbackReasons = getFeedbackReasons(),// Lý do phản hồi
         uiConfig = UiConfig(                   // Cấu hình giao diện
-            rateLayout = R.layout.dialog_rate,
-            feedbackLayout = R.layout.dialog_feedback,
+            rateLayout = R.layout.layout_dialog_rate,
+            feedbackLayout = R.layout.layout_dialog_feedback,
             feedbackItemLayout = R.layout.item_feedback,
             buttonRate = getButtonRateConfig(),
             buttonFeedback = getButtonFeedbackConfig()
@@ -159,8 +159,8 @@ object RateUtils {
             rateOptions = getRateOptions(),
             feedbackReasons = getFeedbackReasons(),
             uiConfig = UiConfig(
-                rateLayout = R.layout.dialog_rate, 
-                feedbackLayout = R.layout.dialog_feedback,
+                rateLayout = R.layout.layout_dialog_rate, 
+                feedbackLayout = R.layout.layout_dialog_feedback,
                 feedbackItemLayout = R.layout.item_feedback,
                 buttonRate = getButtonRateConfig(),
                 buttonFeedback = getButtonFeedbackConfig()
@@ -283,7 +283,7 @@ Lưu ý quan trọng trong `RateUtils.kt` của module app:
 
 Dưới đây là mã nguồn của các tệp layout XML mặc định được sử dụng bởi thư viện `rate` (nếu bạn không cung cấp layout tùy chỉnh thông qua `UiConfig`).
 
-### 5.1. rate_item_reason_feedback.xml
+### 5.1. item_feedback.xml
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -315,7 +315,7 @@ Dưới đây là mã nguồn của các tệp layout XML mặc định được
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-### 5.2. rate_layout_dialog_feedback.xml
+### 5.2. layout_dialog_feedback.xml
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -410,7 +410,7 @@ Dưới đây là mã nguồn của các tệp layout XML mặc định được
 </androidx.cardview.widget.CardView>
 ```
 
-### 5.3. rate_layout_dialog_rate.xml
+### 5.3. layout_dialog_rate.xml
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
