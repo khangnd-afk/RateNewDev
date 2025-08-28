@@ -107,7 +107,7 @@ import android.util.Log
 import android.view.View
 import com.tnt.rate.core.RateCallback
 import com.tnt.rate.core.RateManager
-import com.tnt.rate.core.RateUtils // Đây là com.tnt.rate.core.RateUtils, không phải class này
+import com.tnt.rate.core.RateUtils 
 import com.tnt.rate.model.DisableType
 import com.tnt.rate.model.FeedbackReason
 import com.tnt.rate.model.IntervalType
@@ -115,14 +115,12 @@ import com.tnt.rate.model.RateConfig
 import com.tnt.rate.model.RateOption
 import com.tnt.rate.model.UiConfig
 
-// Đổi tên object này để tránh trùng lặp nếu cần, ví dụ: AppRateHelper
-object RateUtils { // Đây là object trong module app của bạn
+object RateUtils {
 
     fun init(context: Application) {
         if (RateManager.isInit) return
 
         val config = buildConfig()
-        // Sử dụng BuildConfig từ module app của bạn
         RateManager.init(context, true, config, com.tnt.ratenewdev.BuildConfig.DEBUG)
     }
 
@@ -131,10 +129,10 @@ object RateUtils { // Đây là object trong module app của bạn
             RateManager.showRate(
                 context, isShowNow, createCallback(
                 onRate = { star, isSubmit ->
-                    // Xử lý khi người dùng rate
+                   
                 },
                 onFeedback = { message, text, isSubmit ->
-                    // Xử lý khi người dùng gửi feedback (qua dialog rate)
+                  
                 }
             ))
         }
@@ -145,7 +143,7 @@ object RateUtils { // Đây là object trong module app của bạn
             RateManager.showFeedBack(
                 context, isShowNow, createCallback(
                     onFeedback = { message, text, isSubmit ->
-                        // Xử lý khi người dùng gửi feedback (qua dialog feedback trực tiếp)
+                        
                     }
                 ))
         }
@@ -155,29 +153,29 @@ object RateUtils { // Đây là object trong module app của bạn
 
     private fun buildConfig(): RateConfig {
         return RateConfig.Builder(
-            appName = "Rate Example", // Thay bằng tên ứng dụng của bạn
-            packageId = "com.tnt.ratenewdev", // Thay bằng package ID ứng dụng của bạn
-            supportEmail = "support@example.com", // Thay bằng email hỗ trợ
+            appName = "Rate Example", 
+            packageId = "com.tnt.ratenewdev",
+            supportEmail = "support@example.com",
             rateOptions = getRateOptions(),
             feedbackReasons = getFeedbackReasons(),
             uiConfig = UiConfig(
-                rateLayout = R.layout.dialog_rate, // Layout dialog rate của bạn
-                feedbackLayout = R.layout.dialog_feedback, // Layout dialog feedback của bạn
-                feedbackItemLayout = R.layout.item_feedback, // Layout item lý do feedback
+                rateLayout = R.layout.dialog_rate, 
+                feedbackLayout = R.layout.dialog_feedback,
+                feedbackItemLayout = R.layout.item_feedback,
                 buttonRate = getButtonRateConfig(),
                 buttonFeedback = getButtonFeedbackConfig()
             )
         )
             .setMinSession(0)
-            .setSessionInterval(0) // Mặc định trong RateConfig.Builder
-            .setMaxShowPerSession(Int.MAX_VALUE) // Mặc định trong RateConfig.Builder
+            .setSessionInterval(0) 
+            .setMaxShowPerSession(Int.MAX_VALUE)
             .setMinIntervalMillis(10000, IntervalType.GLOBAL)
-            .setMaxTotalShow(Int.MAX_VALUE) // Mặc định trong RateConfig.Builder
-            .setDisableAfterStars(4) // Mặc định trong RateConfig.Builder
-            .setDisableType(DisableType.SESSION) // Mặc định trong RateConfig.Builder
-            .setOpenInAppReviewAfterStars(4) // Mặc định trong RateConfig.Builder
-            .setMaxStarsForFeedback(4) // Cấu hình trong RateUtils là 4, mặc định builder là 0
-            .setDisableOpenInAppReview(false) // Mặc định trong RateConfig.Builder
+            .setMaxTotalShow(Int.MAX_VALUE) 
+            .setDisableAfterStars(4) 
+            .setDisableType(DisableType.SESSION)
+            .setOpenInAppReviewAfterStars(4) 
+            .setMaxStarsForFeedback(4) 
+            .setDisableOpenInAppReview(false) 
             .setCustomShowCondition { !RateManager.isRated }
             .setForceShowCondition { false }
             .build()
