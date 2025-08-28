@@ -283,7 +283,7 @@ Lưu ý quan trọng trong `RateUtils.kt` của module app:
 
 Dưới đây là mã nguồn của các tệp layout XML mặc định được sử dụng bởi thư viện `rate` (nếu bạn không cung cấp layout tùy chỉnh thông qua `UiConfig`).
 
-### 5.1. item_feedback.xml
+### 4.1. item_feedback.xml
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -315,7 +315,7 @@ Dưới đây là mã nguồn của các tệp layout XML mặc định được
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-### 5.2. layout_dialog_feedback.xml
+### 4.2. layout_dialog_feedback.xml
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -410,7 +410,7 @@ Dưới đây là mã nguồn của các tệp layout XML mặc định được
 </androidx.cardview.widget.CardView>
 ```
 
-### 5.3. layout_dialog_rate.xml
+### 4.3. layout_dialog_rate.xml
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
