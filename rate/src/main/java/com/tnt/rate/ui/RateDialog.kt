@@ -9,19 +9,20 @@ import com.tnt.rate.core.RateCallback
 import com.tnt.rate.core.RateManager
 import com.tnt.rate.core.RatePrefs
 import com.tnt.rate.core.StarRatingHelper
+import com.tnt.rate.core.openBrowser
 import com.tnt.rate.core.setBackgroundSafe
 import com.tnt.rate.core.setImageSafe
 import com.tnt.rate.core.setTextColorSafe
 import com.tnt.rate.core.setTextSafe
 import com.tnt.rate.core.showReviewInApp
-import com.tnt.rate.model.OptionButtonConfig
 import com.tnt.rate.model.RateOption
+import com.tnt.rate.model.UiConfig
 
 class RateDialog(
     context: Context,
     val layoutRes: Int,
     val rateOptions: List<RateOption>,
-    val btnConfig: OptionButtonConfig?,
+    val btnConfig: UiConfig.OptionButtonConfig?,
     val callback: RateCallback,
 ) : BaseDialog(context, layoutRes) {
 
@@ -67,17 +68,16 @@ class RateDialog(
     private fun initBtnRate(isEnable: Boolean) {
         btnRate?.isEnabled = isEnable
 
-        if (btnConfig?.backgroundUnselected == null) {
-            btnRate?.alpha = if (isEnable) 1f else 0.7f
+        if (btnConfig?.bgUnselected == null) {
+            btnRate?.alpha = if (isEnable) 1f else 0.75f
         }
-
         if (isEnable) {
-            btnRate?.setBackgroundSafe(btnConfig?.backgroundSelected)
+            btnRate?.setBackgroundSafe(btnConfig?.bgSelected)
             btnRate?.setTextColorSafe(btnConfig?.textColorSelected)
             btnRate?.setTextSafe(btnConfig?.textSelected)
         } else {
             ivPreview?.setImageSafe(rateOptions.firstOrNull()?.iconPreview)
-            btnRate?.setBackgroundSafe(btnConfig?.backgroundUnselected)
+            btnRate?.setBackgroundSafe(btnConfig?.bgUnselected)
             btnRate?.setTextColorSafe(btnConfig?.textColorUnselected)
             btnRate?.setTextSafe(btnConfig?.textUnselected)
         }
@@ -94,20 +94,29 @@ class RateDialog(
 
     private fun submitRate() {
         val star = starRatingHelper!!.currentRating
-        callback.onRate(star, true)
         RatePrefs.saveLastStars(context, star)
-        if (RateManager.config.openInAppReviewAfterStars >= star) {
-            showReviewInApp { isSuccess, message ->
-                callback.showReviewInApp(isSuccess, message)
-                if (isSuccess) {
+        RatePrefs.setRated(context, true)
+        callback.onRate(star, true)
+
+        when {
+            star <= RateManager.config.maxStarsForFeedback -> {
+                RateManager.showFeedBack(context, true, callback)
+                dismiss()
+            }
+
+            star <= RateManager.config.openInAppReviewAfterStars -> {
+                if (RateManager.config.disableOpenInAppReview) {
+                    openBrowser("https://play.google.com/store/apps/details?id=${RateManager.packageId}")
                     dismiss()
                 } else {
-                    dismiss()
+                    showReviewInApp { isSuccess, message ->
+                        callback.showReviewInApp(isSuccess, message)
+                        dismiss()
+                    }
                 }
             }
-        } else {
-            RateManager.showFeedBack(context, true, callback)
-            dismiss()
+
+            else -> dismiss()
         }
     }
 

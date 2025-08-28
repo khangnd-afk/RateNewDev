@@ -6,23 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="@dimen/_16sdp">
+    app:cardCornerRadius="16dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/_16sdp">
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tvRate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
-            android:paddingStart="@dimen/_24sdp"
-            android:paddingLeft="@dimen/_24sdp"
+            android:paddingStart="24dp"
+            android:paddingLeft="24dp"
             android:text="Your feedback is helpful"
             android:textColor="#000000"
-            android:textSize="@dimen/_18ssp"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/ivClose"
             app:layout_constraintEnd_toStartOf="@+id/ivClose"
@@ -32,9 +32,9 @@
 
         <ImageView
             android:id="@+id/ivClose"
-            android:layout_width="@dimen/_48sdp"
-            android:layout_height="@dimen/_48sdp"
-            android:padding="@dimen/_8sdp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="8dp"
             android:src="@drawable/ic_close_rate"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +44,7 @@
             android:id="@+id/rcvReason"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="@dimen/_350sdp"
+            android:maxHeight="350dp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
@@ -55,12 +55,12 @@
         <EditText
             android:id="@+id/edtFeedback"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_118sdp"
-            android:layout_marginTop="@dimen/_16sdp"
+            android:layout_height="118dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/custom_edittext_feedback"
             android:gravity="top"
             android:hint="Type your text here"
-            android:padding="@dimen/_10sdp"
+            android:padding="10dp"
             android:textColor="#000000"
             android:textColorHint="#8044565B"
             android:visibility="gone"
@@ -71,16 +71,16 @@
         <TextView
             android:id="@+id/btnFeedback"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_64sdp"
-            android:layout_marginHorizontal="@dimen/_16sdp"
-            android:layout_marginTop="@dimen/_16sdp"
+            android:layout_height="64dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/btn_submit_df"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
             android:text="OK"
             android:textColor="#FFFFFF"
-            android:textSize="@dimen/_16ssp"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

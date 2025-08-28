@@ -8,18 +8,20 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import com.tnt.rate.R
 import com.tnt.rate.core.RateCallback
+import com.tnt.rate.core.RateManager
+import com.tnt.rate.core.sendFeedback
 import com.tnt.rate.core.setBackgroundSafe
 import com.tnt.rate.core.setTextColorSafe
 import com.tnt.rate.core.setTextSafe
 import com.tnt.rate.model.FeedbackReason
-import com.tnt.rate.model.OptionButtonConfig
+import com.tnt.rate.model.UiConfig
 
 class RateDialogFeedBack(
     context: Context,
     val layoutRes: Int,
     val layoutItemFeedBack: Int,
     val feedbackReasons: List<FeedbackReason>,
-    val btnConfig: OptionButtonConfig?,
+    val btnConfig: UiConfig.OptionButtonConfig?,
     val callback: RateCallback
 ) : BaseDialog(context, layoutRes) {
 
@@ -44,15 +46,10 @@ class RateDialogFeedBack(
 
     override fun initListener() {
         edtFeedback?.addTextChangedListener {
-            updateBtnState(reason)
+            runCatching { updateBtnState(reason) }
         }
         btnFeedback?.setOnClickListener {
-            callback.onFeedBack(
-                context.getString(reason!!.title),
-                textFeedback,
-                true
-            )
-            dismiss()
+            runCatching { sendFeedback() }
         }
         ivClose?.setOnClickListener {
             dismiss()
@@ -68,12 +65,32 @@ class RateDialogFeedBack(
         adapter?.submitList(feedbackReasons.toList())
     }
 
+    private fun sendFeedback() {
+        callback.onFeedBack(
+            feedbackReasons.indexOf(reason),
+            context.getString(reason!!.title),
+            textFeedback,
+            true
+        )
+        val feedbackText = buildString {
+            append(context.getString(reason!!.title))
+            if (textFeedback.isNotBlank()) {
+                append("\n+ ")
+                append(textFeedback)
+            }
+        }
+
+        sendFeedback(RateManager.supportEmail, feedbackText)
+        dismiss()
+    }
+
     private fun updateBtnState(reason: FeedbackReason?) {
         reason?.let {
             val hasSelection = adapter?.selectedPosition != RecyclerView.NO_POSITION
             val needInput = reason.requireInput
             val hasText = textFeedback.isNotBlank()
             callback.onFeedBack(
+                feedbackReasons.indexOf(reason),
                 context.getString(reason.title),
                 textFeedback,
                 false
@@ -86,16 +103,16 @@ class RateDialogFeedBack(
 
     private fun initBtnFeedback(isEnable: Boolean) {
         btnFeedback?.isEnabled = isEnable
-        if (btnConfig?.backgroundUnselected == null) {
-            btnFeedback?.alpha = if (isEnable) 1f else 0.7f
+        if (btnConfig?.bgUnselected == null) {
+            btnFeedback?.alpha = if (isEnable) 1f else 0.75f
         }
 
         if (isEnable) {
-            btnFeedback?.setBackgroundSafe(btnConfig?.backgroundSelected)
+            btnFeedback?.setBackgroundSafe(btnConfig?.bgSelected)
             btnFeedback?.setTextColorSafe(btnConfig?.textColorSelected)
             btnFeedback?.setTextSafe(btnConfig?.textSelected)
         } else {
-            btnFeedback?.setBackgroundSafe(btnConfig?.backgroundUnselected)
+            btnFeedback?.setBackgroundSafe(btnConfig?.bgUnselected)
             btnFeedback?.setTextColorSafe(btnConfig?.textColorUnselected)
             btnFeedback?.setTextSafe(btnConfig?.textUnselected)
         }

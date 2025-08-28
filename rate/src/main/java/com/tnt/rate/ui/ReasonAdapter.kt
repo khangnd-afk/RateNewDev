@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.tnt.rate.R
 import com.tnt.rate.core.setImageSafe
+import com.tnt.rate.core.setTextColorSafe
 import com.tnt.rate.core.setTextSafe
 import com.tnt.rate.model.FeedbackReason
 
@@ -39,6 +40,7 @@ class ReasonAdapter(
 
         private val tvReason = view.findViewById<TextView?>(R.id.tvReason)
         private val ivSelect = view.findViewById<ImageView?>(R.id.ivSelect)
+        private val ivBgSelect = view.findViewById<ImageView?>(R.id.ivBgSelect)
 
         init {
             view.setOnClickListener {
@@ -62,9 +64,13 @@ class ReasonAdapter(
 
         fun updateSelectionUI(isSelected: Boolean, item: FeedbackReason) {
             if (isSelected) {
-                ivSelect?.setImageSafe(item.iconSelect)
+                ivSelect?.setImageSafe(item.icSelected)
+                tvReason?.setTextColorSafe(item.textColorSelected)
+                ivBgSelect?.setImageSafe(item.bgSelected)
             } else {
-                ivSelect?.setImageSafe(item.iconUnselect)
+                ivSelect?.setImageSafe(item.icUnselected)
+                tvReason?.setTextColorSafe(item.textColorUnselected)
+                ivBgSelect?.setImageSafe(item.bgUnselected)
             }
         }
     }

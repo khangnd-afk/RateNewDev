@@ -1,6 +1,5 @@
 package com.tnt.rate.model
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import java.util.UUID
@@ -9,7 +8,11 @@ import java.util.UUID
 data class FeedbackReason(
     val id: String = UUID.randomUUID().toString(),
     @StringRes val title: Int,
-    val iconSelect: Int,
-    val iconUnselect: Int,
+    val icSelected: Int,
+    val icUnselected: Int,
+    val bgSelected: Int? = null,
+    val bgUnselected: Int? = null,
+    val textColorSelected: Int? = null,
+    val textColorUnselected: Int? = null,
     val requireInput: Boolean = false,
 )

@@ -13,7 +13,7 @@ class StarRatingHelper(
 
     init {
         stars.forEachIndexed { index, imageView ->
-            imageView.setImageSafe(drawableRes = rateOptions[index].starEmptyIcon)
+            imageView.setImageSafe(source = rateOptions[index].starEmptyIcon)
             imageView.zoomIn(450L + (100 * index))
             if (!disable) imageView.setOnClickListener {
                 imageView.bounceIn(400)
@@ -26,7 +26,7 @@ class StarRatingHelper(
         currentRating = rating
         stars.forEachIndexed { index, imageView ->
             imageView.setImageSafe(
-                drawableRes = if (index < rating) {
+                source = if (index < rating) {
                     rateOptions[index].starFullIcon
                 } else {
                     rateOptions[index].starEmptyIcon

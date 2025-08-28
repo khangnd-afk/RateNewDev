@@ -5,157 +5,185 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.LayoutRes
 
-/**
- * Cấu hình cho Rate/Feedback dialog.
- *
- * Dùng để kiểm soát logic hiển thị & giao diện cho dialog đánh giá và feedback.
- *
- * @property packageId                  Package name của ứng dụng.
- * @property supportEmail               Email support khi người dùng gửi feedback.
- * @property rateOptions                Danh sách lựa chọn rate (ví dụ: 1★ = "Tệ", 5★ = "Tuyệt vời").
- * @property feedbackReasons            Danh sách lý do khi người dùng chọn gửi feedback.
- * @property layoutConfig               Cấu hình layout hiển thị cho dialog rate/feedback.
- *
- * @property minSession                 Số phiên tối thiểu trước khi được phép hiển thị dialog.
- *                                      Ví dụ: =2 → chỉ bắt đầu hiển thị từ phiên mở app thứ 2.
- *
- * @property maxShowPerSession          Số lần hiển thị tối đa trong 1 phiên (session).
- *                                      Tránh việc hiển thị quá nhiều trong cùng 1 lần mở app.
- *
- * @property minIntervalMillis          Khoảng thời gian tối thiểu (ms) giữa 2 lần hiển thị liên tiếp.
- *                                      Nếu chưa đủ thì dialog sẽ không hiển thị lại.
- *
- * @property maxTotalShow               Tổng số lần hiển thị tối đa trong toàn bộ vòng đời app.
- *                                      Nếu vượt quá thì dialog sẽ không hiện lại nữa.
- *
- * @property disableAfterStars          Nếu người dùng đánh giá >= số sao này → tắt vĩnh viễn dialog.
- *                                      Ví dụ: =4 → nếu user rate 4★ hoặc 5★ thì không show lại.
- *
- * @property openInAppReviewAfterStars  Nếu người dùng rate >= số sao này → mở Google Play In-App Review.
- *                                      Ví dụ: =5 → chỉ khi user chọn 5★ mới trigger review flow.
- *
- * @property buttonRate                 Cấu hình giao diện cho button "Rate" (tuỳ chọn).
- * @property buttonFeedback             Cấu hình giao diện cho button "Feedback" (tuỳ chọn).
- */
+@Keep
+enum class DisableType {
+    SESSION,
+    FOREVER
+}
+
+@Keep
+enum class IntervalType {
+    SESSION, GLOBAL
+}
+
 @Keep
 data class RateConfig(
+    val appName: String,
     val packageId: String,
     val supportEmail: String,
     val rateOptions: List<RateOption>,
     val feedbackReasons: List<FeedbackReason>,
-    val layoutConfig: LayoutConfig,
-    val minSession: Int = 0,
-    val maxShowPerSession: Int = 0,
-    val minIntervalMillis: Long = 0,
-    val maxTotalShow: Int = 0,
-    val disableAfterStars: Int = 0,
-    val disableType: DisableType = DisableType.SESSION,
-    val openInAppReviewAfterStars: Int = 0,
-    val buttonRate: OptionButtonConfig? = null,
-    val buttonFeedback: OptionButtonConfig? = null
-) {
-    @Keep
-    enum class DisableType {
-        SESSION,
-        FOREVER
-    }
-    /**
-     * Cấu hình layout XML cho dialog & item.
-     *
-     * @property rateLayout         Layout của dialog rate (chọn sao).
-     * @property feedbackLayout     Layout của dialog feedback (chọn lý do).
-     * @property feedbackItemLayout Layout của từng item feedback.
-     */
-    @Keep
-    data class LayoutConfig(
-        @LayoutRes val rateLayout: Int,
-        @LayoutRes val feedbackLayout: Int,
-        @LayoutRes val feedbackItemLayout: Int
-    )
+    val uiConfig: UiConfig,
 
-    /**
-     * Builder pattern để khởi tạo [RateConfig] linh hoạt hơn.
-     */
+    val minSession: Int,
+    val sessionInterval: Int,
+    val maxShowPerSession: Int,
+    val minIntervalMillis: Long,
+    val intervalType: IntervalType,
+    val maxTotalShow: Int,
+    val disableAfterStars: Int,
+    val disableType: DisableType,
+    val openInAppReviewAfterStars: Int,
+    val maxStarsForFeedback: Int,
+    val disableOpenInAppReview: Boolean,
+    val customCondition: (() -> Boolean)?,
+    val forceShowCondition: (() -> Boolean)?
+) {
+
+
     class Builder(
+        private val appName: String,
         private val packageId: String,
         private val supportEmail: String,
         private val rateOptions: List<RateOption>,
         private val feedbackReasons: List<FeedbackReason>,
-        private val layoutConfig: LayoutConfig
+        private val uiConfig: UiConfig
     ) {
-        private var minSession: Int = 1
-        private var maxShowPerSession: Int = 1
+        private var minSession: Int = 0
+        private var sessionInterval: Int = 0
+        private var maxShowPerSession: Int = Int.MAX_VALUE
         private var minIntervalMillis: Long = 0
+        private var intervalType: IntervalType = IntervalType.SESSION
         private var maxTotalShow: Int = Int.MAX_VALUE
         private var disableAfterStars: Int = 4
-        private var disableType: DisableType = DisableType.FOREVER
-        private var openInAppReviewAfterStars: Int = 5
-        private var buttonRate: OptionButtonConfig? = null
-        private var buttonFeedback: OptionButtonConfig? = null
+        private var disableType: DisableType = DisableType.SESSION
+        private var openInAppReviewAfterStars: Int = 4
+        private var maxStarsForFeedback: Int = 0
+        private var disableOpenInAppReview: Boolean = false
+        private var customCondition: (() -> Boolean)? = null
+        private var forceShowCondition: (() -> Boolean)? = null
 
-        /** Số phiên tối thiểu trước khi cho phép show dialog */
-        fun setMinSession(value: Int) = apply { minSession = value }
+        /**
+         * Số session tối thiểu trước khi dialog được phép hiển thị.
+         */
+        fun setMinSession(value: Int) = apply { this.minSession = value }
 
-        /** Giới hạn số lần show trong 1 phiên */
-        fun setMaxShowPerSession(value: Int) = apply { maxShowPerSession = value }
+        /**
+         * Khoảng cách giữa các lần session hiển thị dialog.
+         * Ví dụ: 2 → cứ cách 2 session thì được phép hiển thị lại.
+         */
+        fun setSessionInterval(value: Int) = apply { this.sessionInterval = value }
 
-        /** Thời gian tối thiểu giữa 2 lần show (ms) */
-        fun setMinIntervalMillis(value: Long) = apply { minIntervalMillis = value }
+        /**
+         * Giới hạn số lần show trong 1 session.
+         */
+        fun setMaxShowPerSession(value: Int) = apply { this.maxShowPerSession = value }
 
-        /** Tổng số lần show tối đa */
-        fun setMaxTotalShow(value: Int) = apply { maxTotalShow = value }
+        /**
+         * Cấu hình khoảng thời gian tối thiểu (ms) giữa 2 lần hiển thị dialog.
+         *
+         * @param value thời gian tối thiểu tính bằng millisecond.
+         * @param type kiểu khoảng thời gian cần áp dụng:
+         *  - [IntervalType.SESSION] → giới hạn trong phạm vi session hiện tại.
+          *
+         *  - [IntervalType.GLOBAL] → giới hạn trên toàn bộ vòng đời ứng dụng (dữ liệu được lưu lại).
+          *
+          */
+        fun setMinIntervalMillis(value: Long, type: IntervalType) = apply {
+            this.minIntervalMillis = value
+            this.intervalType = type
+        }
 
-        /** Nếu rate >= value thì disable vĩnh viễn */
-        fun setDisableAfterStars(value: Int) = apply { disableAfterStars = value }
+        /**
+         * Tổng số lần hiển thị tối đa trong suốt vòng đời app.
+         */
+        fun setMaxTotalShow(value: Int) = apply { this.maxTotalShow = value }
 
-        /** Nếu rate >= value thì mở Google In-App Review */
-        fun setOpenInAppReviewAfterStars(value: Int) = apply { openInAppReviewAfterStars = value }
+        /**
+         * Nếu user chọn số sao >= giá trị này → disable dialog trong tương lai.
+         */
+        fun setDisableAfterStars(value: Int) = apply { this.disableAfterStars = value }
 
-        /** Cấu hình button Rate */
-        fun setButtonRate(config: OptionButtonConfig) = apply { buttonRate = config }
+        /**
+         * Kiểu disable khi đạt [disableAfterStars].
+         * SESSION → chỉ trong session hiện tại.
+         * FOREVER → vĩnh viễn.
+         */
+        fun setDisableType(value: DisableType) = apply { this.disableType = value }
 
-        /** Cấu hình button Feedback */
-        fun setButtonFeedback(config: OptionButtonConfig) = apply { buttonFeedback = config }
+        /**
+         * Nếu số sao >= giá trị này → mở In-App Review.
+         */
+        fun setOpenInAppReviewAfterStars(value: Int) =
+            apply { this.openInAppReviewAfterStars = value }
 
-        /** Kiểu disable (theo phiên / vĩnh viễn) */
-        fun setDisableType(value: DisableType) = apply { disableType = value }
+        /**
+         * Nếu số sao <= giá trị này → mở dialog feedback.
+         */
+        fun setMaxStarsForFeedback(value: Int) = apply { this.maxStarsForFeedback = value }
 
-        /** Xây dựng [RateConfig] */
-        fun build() = RateConfig(
+        /**
+         * Nếu true → KHÔNG mở In-App Review mà chuyển thẳng sang Store.
+         */
+        fun setDisableOpenInAppReview(value: Boolean) =
+            apply { this.disableOpenInAppReview = value }
+
+        /**
+         * Điều kiện custom bổ sung.
+         * - return true → tiếp tục check các điều kiện khác.
+         * - return false → dialog không hiển thị.
+         */
+        fun setCustomShowCondition(block: () -> Boolean) = apply { this.customCondition = block }
+
+        /**
+         * Điều kiện ép show (bỏ qua toàn bộ điều kiện khác).
+         * - return true → show ngay lập tức.
+         */
+        fun setForceShowCondition(block: () -> Boolean) = apply { this.forceShowCondition = block }
+
+        fun build(): RateConfig = RateConfig(
+            appName,
             packageId,
             supportEmail,
             rateOptions,
             feedbackReasons,
-            layoutConfig,
+            uiConfig,
             minSession,
+            sessionInterval,
             maxShowPerSession,
             minIntervalMillis,
+            intervalType,
             maxTotalShow,
             disableAfterStars,
             disableType,
             openInAppReviewAfterStars,
-            buttonRate,
-            buttonFeedback
+            maxStarsForFeedback,
+            disableOpenInAppReview,
+            customCondition,
+            forceShowCondition
         )
     }
 }
 
 /**
- * Cấu hình giao diện cho các button (Rate/Feedback).
- *
- * @property textSelected         String resource cho text khi được chọn.
- * @property textUnselected       String resource cho text khi chưa chọn.
- * @property backgroundSelected   Drawable resource cho background khi chọn.
- * @property backgroundUnselected Drawable resource cho background khi chưa chọn.
- * @property textColorSelected    Color resource cho text khi chọn.
- * @property textColorUnselected  Color resource cho text khi chưa chọn.
+ * ===============================
+ * UiConfig
+ * ===============================
  */
 @Keep
-data class OptionButtonConfig(
-    val textSelected: Int? = null,
-    val textUnselected: Int? = null,
-    @DrawableRes val backgroundSelected: Int? = null,
-    @DrawableRes val backgroundUnselected: Int? = null,
-    @ColorRes val textColorSelected: Int? = null,
-    @ColorRes val textColorUnselected: Int? = null
-)
+data class UiConfig(
+    @LayoutRes val rateLayout: Int,
+    @LayoutRes val feedbackLayout: Int,
+    @LayoutRes val feedbackItemLayout: Int,
+    val buttonRate: OptionButtonConfig,
+    val buttonFeedback: OptionButtonConfig
+) {
+    data class OptionButtonConfig(
+        val textSelected: Int? = null,
+        val textUnselected: Int? = null,
+        @DrawableRes val bgSelected: Int? = null,
+        @DrawableRes val bgUnselected: Int? = null,
+        @ColorRes val textColorSelected: Int? = null,
+        @ColorRes val textColorUnselected: Int? = null
+    )
+}
