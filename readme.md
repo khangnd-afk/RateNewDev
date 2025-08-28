@@ -190,11 +190,25 @@ object RateUtils {
     ): RateCallback {
         return object : RateCallback {
             override fun onRate(star: Int, isSubmit: Boolean) {
+//                if (isSubmit) {
+//                    Tracking.logParams("hit_submit_dialog_send_rate") {
+//                        param("star", count.toString())
+//                    }
+//                }
                 Log.d("RATE_CONFIG", "onRate: star=$star, isSubmit=$isSubmit")
                 onRate?.invoke(star, isSubmit)
             }
 
             override fun onFeedBack(count: Int, message: String, text: String, isSubmit: Boolean) {
+//                if (isSubmit) {
+//                    Tracking.logParams("hit_submit_dialog_feedback") {
+//                        param("count", count.toString())
+//                        param("feedback_reason", message)
+//                        param("original_feedback", text)
+//                        param("device", RateUtils.getDeviceInfo())
+//                        param("country", Locale.getDefault().country)
+//                    }
+//                }
                 Log.d("RATE_CONFIG", "onFeedBack: message=$message, text=$text, isSubmit=$isSubmit")
                 onFeedback?.invoke(message, text, isSubmit)
             }
