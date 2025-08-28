@@ -278,4 +278,273 @@ Lưu ý quan trọng trong `RateUtils.kt` của module app:
 -  Trong `getRateOptions()`, việc gọi `RateUtils.getRateOptions(...)` thực chất là đang gọi `com.tnt.rate.core.RateUtils.getRateOptions(...)` từ thư viện `rate`. Nếu có sự nhầm lẫn về tên, bạn có thể cần chỉ định rõ package đầy đủ như ví dụ.
 
 ---
+
+## 4. Mã nguồn Layout XML Mặc định
+
+Dưới đây là mã nguồn của các tệp layout XML mặc định được sử dụng bởi thư viện `rate` (nếu bạn không cung cấp layout tùy chỉnh thông qua `UiConfig`).
+
+### 5.1. rate_item_reason_feedback.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp">
+
+    <ImageView
+        android:id="@+id/ivBgSelect"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/ivSelect"
+        android:layout_width="24dp"
+        android:layout_height="24dp" />
+
+    <TextView
+        android:id="@+id/tvReason"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivSelect"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+### 5.2. rate_layout_dialog_feedback.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvRate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:paddingStart="24dp"
+            android:paddingLeft="24dp"
+            android:text="Your feedback is helpful"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/ivClose"
+            app:layout_constraintEnd_toStartOf="@+id/ivClose"
+            app:layout_constraintStart_toStartOf="@+id/rcvReason"
+            app:layout_constraintTop_toTopOf="@+id/ivClose"
+            tools:ignore="RtlSymmetry" />
+
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_close_rate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#666666" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="350dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivClose"
+            tools:listitem="@layout/rate_item_reason_feedback" />
+
+        <EditText
+            android:id="@+id/edtFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="118dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/custom_edittext_feedback"
+            android:gravity="top"
+            android:hint="Type your text here"
+            android:padding="10dp"
+            android:textColor="#000000"
+            android:textColorHint="#8044565B"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/rcvReason"
+            app:layout_constraintStart_toStartOf="@+id/rcvReason"
+            app:layout_constraintTop_toBottomOf="@+id/rcvReason" />
+
+        <TextView
+            android:id="@+id/btnFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/btn_submit_df"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="OK"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edtFeedback"
+            app:layout_constraintWidth_percent="0.85" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
+```
+
+### 5.3. rate_layout_dialog_rate.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16sp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16sp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:textColor="#000000"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/ivClose"
+                app:layout_constraintEnd_toStartOf="@+id/ivClose"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/ivClose"
+                tools:text="Title" />
+
+            <ImageView
+                android:id="@+id/ivClose"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_close_rate"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="#666666" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="14dp"
+            tools:text="How do you feel about the app? Your feedback is important to us" />
+
+        <ImageView
+            android:id="@+id/ivPreview"
+            android:layout_width="159dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="16dp"
+            tools:src="@drawable/iv_preview_rate" />
+
+        <TextView
+            android:id="@+id/ctaRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivStar1"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                tools:src="@drawable/ic_star" />
+
+            <ImageView
+                android:id="@+id/ivStar2"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginHorizontal="16dp"
+                tools:src="@drawable/ic_star" />
+
+            <ImageView
+                android:id="@+id/ivStar3"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                tools:src="@drawable/ic_star" />
+
+            <ImageView
+                android:id="@+id/ivStar4"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginHorizontal="16dp"
+                tools:src="@drawable/ic_star" />
+
+            <ImageView
+                android:id="@+id/ivStar5"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                tools:src="@drawable/ic_star" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:drawableEnd="@drawable/ic_rate_plus"
+            android:drawablePadding="5dp"
+            android:gravity="center"
+            android:text="The best we can get"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/btnRate"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_submit_df"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="OK"
+            android:textColor="#FFFFFF"
+            android:textSize="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintWidth_percent="0.85" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+```
 Vui lòng kiểm tra lại đường dẫn và nội dung.
