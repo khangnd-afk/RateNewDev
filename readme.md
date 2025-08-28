@@ -11,7 +11,7 @@ Cách nhanh nhất để tích hợp là sử dụng đối tượng `RateUtils`
 Trong lớp `Application` hoặc `MainActivity` của bạn, gọi phương thức `RateUtils.init()`:
 
 ```kotlin
-        RateUtils.init(application)
+RateUtils.init(application)
 ```
 Lưu ý: `RateUtils.init()` sẽ tự động gọi `RateManager.init()` với một cấu hình mặc định (được định nghĩa trong `RateUtils.buildConfig()`).
 
@@ -247,7 +247,6 @@ object RateUtils {
         )
     )
 
-    // Sử dụng com.tnt.rate.core.RateUtils từ thư viện rate
     private fun getRateOptions(): List<RateOption> {
         return com.tnt.rate.core.RateUtils.getRateOptions(
             messages = listOf(
