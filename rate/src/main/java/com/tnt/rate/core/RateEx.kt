@@ -1,5 +1,6 @@
 package com.tnt.rate.core
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.view.View
@@ -92,16 +93,19 @@ fun BaseDialog.openBrowser(url: String) {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     context.startActivity(intent)
 }
-
-fun BaseDialog.showReviewInApp(onSuccess: (Boolean, String) -> Unit) {
-    val manager = ReviewManagerFactory.create(context)
-    val request = manager.requestReviewFlow()
-    request.addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            onSuccess(true, "Review flow finished (user may or may not have submitted).")
-        } else {
-            val reviewError = (task.exception as? ReviewException)?.message ?: "Unknown error"
-            onSuccess(false, reviewError)
+ fun BaseDialog.showReviewInApp(onSuccess: (Boolean, String) -> Unit) {
+    runCatching {
+        val manager = ReviewManagerFactory.create(context)
+        val request = manager.requestReviewFlow()
+        request.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val reviewInfo = task.result
+                manager.launchReviewFlow( context as Activity, reviewInfo)
+                onSuccess(true, "Review flow finished (user may or may not have submitted).")
+            } else {
+                val reviewError = (task.exception as? ReviewException)?.message ?: "Unknown error"
+                onSuccess(false, reviewError)
+            }
         }
     }
 }
