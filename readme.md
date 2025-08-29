@@ -121,7 +121,7 @@ object RateUtils {
         if (RateManager.isInit) return
 
         val config = buildConfig()
-        RateManager.init(context, true, config, com.tnt.ratenewdev.BuildConfig.DEBUG)
+        RateManager.init(context, Firebase.remoteConfig.getBoolean("key_rate_enable"), config, com.tnt.ratenewdev.BuildConfig.DEBUG)
     }
 
     fun showRate(context: Context, isShowNow: Boolean = false) {
