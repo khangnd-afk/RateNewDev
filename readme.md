@@ -1,19 +1,20 @@
-# Hướng dẫn Sử dụng Thư viện Rate
+# Hướng dẫn sử dụng Rate Library
 
-Thư viện này cung cấp một giải pháp dễ dàng để hiển thị hộp thoại đánh giá (rate) và phản hồi (feedback) trong ứng dụng Android của bạn.
+Thư viện Rate cung cấp giải pháp dễ dàng để hiển thị hộp thoại đánh giá (rating) và phản hồi (feedback) trong ứng dụng Android, giúp cải thiện trải nghiệm người dùng và thu thập ý kiến.
 
 ## 1. Hướng dẫn Triển khai Nhanh (RateUtils)
 
-Cách nhanh nhất để tích hợp là sử dụng đối tượng `RateUtils`.
+Cách nhanh nhất để tích hợp thư viện là sử dụng đối tượng `RateUtils`.
 
 ### 1.1. Khởi tạo
 
-Trong lớp `Application` hoặc `MainActivity` của bạn, gọi phương thức `RateUtils.init()`:
+Trong lớp `Application` hoặc `MainActivity`, gọi phương thức `RateUtils.init()`:
 
 ```kotlin
 RateUtils.init(application)
 ```
-Lưu ý: `RateUtils.init()` sẽ tự động gọi `RateManager.init()` với một cấu hình mặc định (được định nghĩa trong `RateUtils.buildConfig()`).
+
+**Lưu ý**: `RateUtils.init()` sẽ tự động gọi `RateManager.init()` với cấu hình mặc định được định nghĩa trong `RateUtils.buildConfig()`.
 
 ### 1.2. Hiển thị Hộp thoại Đánh giá
 
@@ -21,7 +22,7 @@ Lưu ý: `RateUtils.init()` sẽ tự động gọi `RateManager.init()` với m
 
 ```kotlin
 // context: Context của Activity hoặc Fragment
-// isShowNow: true để hiển thị ngay lập tức, bỏ qua các điều kiện (ví dụ: số session, khoảng thời gian)
+// isShowNow: true để hiển thị ngay lập tức, bỏ qua các điều kiện (số session, khoảng thời gian)
 //            false (mặc định) để tuân theo các điều kiện đã cấu hình
 RateUtils.showRate(context, isShowNow = false)
 ```
@@ -37,9 +38,9 @@ RateUtils.showRate(context, isShowNow = false)
 RateUtils.showFeedback(context, isShowNow = false)
 ```
 
-### 1.4. Reset Dữ liệu (Dành cho Kiểm thử)
+### 1.4. Reset Dữ liệu (Dành cho thử nghiệm)
 
-Để xóa toàn bộ dữ liệu đánh giá đã lưu (hữu ích khi kiểm thử):
+Để xóa toàn bộ dữ liệu đánh giá đã lưu (hữu ích khi kiểm tra):
 
 ```kotlin
 RateUtils.reset()
@@ -47,9 +48,9 @@ RateUtils.reset()
 
 ## 2. Cấu hình Chi tiết (Thông qua RateUtils và RateConfig.Builder)
 
-Bạn có thể tùy chỉnh sâu hơn các hành vi của thư viện thông qua phương thức `RateUtils.buildConfig()`. Phương thức này sử dụng `RateConfig.Builder` để tạo đối tượng `RateConfig`.
+Bạn có thể tùy chỉnh hành vi của thư viện bằng phương thức `RateUtils.buildConfig()`, sử dụng `RateConfig.Builder` để tạo đối tượng `RateConfig`.
 
-Dưới đây là ví dụ về cách `RateUtils` cấu hình `RateConfig` và giải thích các tùy chọn:
+Dưới đây là ví dụ cấu hình `RateConfig` và giải thích các tùy chọn:
 
 ```kotlin
 private fun buildConfig(): RateConfig {
@@ -57,7 +58,7 @@ private fun buildConfig(): RateConfig {
         appName = "Rate Example",              // Tên ứng dụng
         packageId = "com.example.app",         // ID gói
         supportEmail = "support@example.com",  // Email hỗ trợ
-        rateOptions = getRateOptions(),        // Các option hiển thị theo sao
+        rateOptions = getRateOptions(),        // Các tùy chọn hiển thị theo sao
         feedbackReasons = getFeedbackReasons(),// Lý do phản hồi
         uiConfig = UiConfig(                   // Cấu hình giao diện
             rateLayout = R.layout.layout_dialog_rate,
@@ -70,32 +71,31 @@ private fun buildConfig(): RateConfig {
         // Điều kiện theo session
         .setMinSession(0)        // Số session tối thiểu để hiển thị
         .setSessionInterval(0)   // Khoảng cách giữa các session
-        .setMaxShowPerSession(Int.MAX_VALUE) // Số lần show trong 1 session
+        .setMaxShowPerSession(Int.MAX_VALUE) // Số lần hiển thị tối đa trong 1 session
 
         // Điều kiện theo thời gian
-        .setMinIntervalMillis(10_000, IntervalType.GLOBAL) // cách nhau ít nhất 10s (toàn app)
-        .setMaxTotalShow(Int.MAX_VALUE) // Giới hạn số lần show toàn app
+        .setMinIntervalMillis(10_000, IntervalType.GLOBAL) // Cách nhau ít nhất 10 giây (toàn app)
+        .setMaxTotalShow(Int.MAX_VALUE) // Giới hạn số lần hiển thị toàn app
 
         // Điều kiện theo số sao
-        .setDisableAfterStars(4)        // Nếu >=4 sao thì tắt dialog
+        .setDisableAfterStars(4)        // Tắt dialog nếu >= 4 sao
         .setDisableType(DisableType.SESSION) // Tắt trong session hiện tại
-        .setOpenInAppReviewAfterStars(4) // Nếu >=4 sao thì mở In-App Review
-        .setMaxStarsForFeedback(4)      // Nếu <=4 sao thì mở feedback
+        .setOpenInAppReviewAfterStars(4) // Mở In Principled before content. Mở In-App Review nếu >= 4 sao
+        .setMaxStarsForFeedback(4)      // Mở feedback nếu <= 4 sao
         .setDisableOpenInAppReview(false) // Cho phép mở In-App Review
 
         // Điều kiện bổ sung
-        .setCustomShowCondition { !RateManager.isRated } // Không show nếu đã rate
-        .setForceShowCondition { false }                 // Không ép show
+        .setCustomShowCondition { !RateManager.isRated } // Không hiển thị nếu đã đánh giá
+        .setForceShowCondition { false }                 // Không ép hiển thị
         .build()
 }
-
 ```
 
-Để tùy chỉnh, bạn có thể sửa đổi trực tiếp phương thức `buildConfig()` trong `RateUtils.kt` hoặc tự mình khởi tạo `RateManager` với một `RateConfig` tùy chỉnh hoàn toàn.
+Để tùy chỉnh, bạn có thể sửa đổi `buildConfig()` trong `RateUtils.kt` hoặc tự khởi tạo `RateManager` với `RateConfig` tùy chỉnh.
 
 ## 3. Mã nguồn RateUtils.kt
 
-Dưới đây là toàn bộ nội dung của đối tượng `RateUtils.kt` được sử dụng trong ví dụ trên.
+Dưới đây là toàn bộ nội dung của `RateUtils.kt`:
 
 ```kotlin
 package com.tnt.ratenewdev
@@ -129,10 +129,10 @@ object RateUtils {
             RateManager.showRate(
                 context, isShowNow, createCallback(
                 onRate = { star, isSubmit ->
-                   
+                    Log.d("RATE_CONFIG", "onRate: star=$star, isSubmit=$isSubmit")
                 },
                 onFeedback = { message, text, isSubmit ->
-                  
+                    Log.d("RATE_CONFIG", "onFeedBack: message=$message, text=$text, isSubmit=$isSubmit")
                 }
             ))
         }
@@ -143,7 +143,7 @@ object RateUtils {
             RateManager.showFeedBack(
                 context, isShowNow, createCallback(
                     onFeedback = { message, text, isSubmit ->
-                        
+                        Log.d("RATE_CONFIG", "onFeedBack: message=$message, text=$text, isSubmit=$isSubmit")
                     }
                 ))
         }
@@ -189,18 +189,19 @@ object RateUtils {
         onReviewInApp: ((isSuccess: Boolean, message: String) -> Unit)? = null,
     ): RateCallback {
         return object : RateCallback {
-            override fun onRate(star: Int, isSubmit: Boolean) {
-//                if (isSubmit) {
+             override fun onRate(star: Int, isSubmit: Boolean) {
+                Log.d("RATE_CONFIG", "onRate: star=$star, isSubmit=$isSubmit")
+                if (isSubmit) {
 //                    Tracking.logParams("hit_submit_dialog_send_rate") {
 //                        param("star", count.toString())
 //                    }
-//                }
-                Log.d("RATE_CONFIG", "onRate: star=$star, isSubmit=$isSubmit")
+                }
                 onRate?.invoke(star, isSubmit)
             }
 
             override fun onFeedBack(count: Int, message: String, text: String, isSubmit: Boolean) {
-//                if (isSubmit) {
+                Log.d("RATE_CONFIG", "onFeedBack: message=$message, text=$text, isSubmit=$isSubmit")
+                if (isSubmit) {
 //                    Tracking.logParams("hit_submit_dialog_feedback") {
 //                        param("count", count.toString())
 //                        param("feedback_reason", message)
@@ -208,8 +209,7 @@ object RateUtils {
 //                        param("device", RateUtils.getDeviceInfo())
 //                        param("country", Locale.getDefault().country)
 //                    }
-//                }
-                Log.d("RATE_CONFIG", "onFeedBack: message=$message, text=$text, isSubmit=$isSubmit")
+                }
                 onFeedback?.invoke(message, text, isSubmit)
             }
 
@@ -284,18 +284,15 @@ object RateUtils {
         )
     }
 }
-
 ```
 
-Lưu ý quan trọng trong `RateUtils.kt` của module app:
--  Khi gọi `RateManager.init(context, true, config, BuildConfig.DEBUG)`, `BuildConfig.DEBUG` nên là `BuildConfig` của module app (`com.tnt.ratenewdev.BuildConfig.DEBUG`).
--  Trong `getRateOptions()`, việc gọi `RateUtils.getRateOptions(...)` thực chất là đang gọi `com.tnt.rate.core.RateUtils.getRateOptions(...)` từ thư viện `rate`. Nếu có sự nhầm lẫn về tên, bạn có thể cần chỉ định rõ package đầy đủ như ví dụ.
+**Lưu ý**:
+- Khi gọi `RateManager.init(context, true, config, BuildConfig.DEBUG)`, sử dụng `BuildConfig` của module app (`com.tnt.ratenewdev.BuildConfig.DEBUG`).
+- Trong `getRateOptions()`, hàm `RateUtils.getRateOptions(...)` thực chất gọi `com.tnt.rate.core.RateUtils.getRateOptions(...)` từ thư viện rate. Chỉ định đầy đủ gói nếu cần.
 
----
+## 4. Mặc định XML bố cục
 
-## 4. Mã nguồn Layout XML Mặc định
-
-Dưới đây là mã nguồn của các tệp layout XML mặc định được sử dụng bởi thư viện `rate` (nếu bạn không cung cấp layout tùy chỉnh thông qua `UiConfig`).
+Dưới đây là mã nguồn XML mặc định của các tệp bố cục được sử dụng nếu không cung cấp `UiConfig` tùy chỉnh.
 
 ### 4.1. item_feedback.xml
 
@@ -333,7 +330,6 @@ Dưới đây là mã nguồn của các tệp layout XML mặc định được
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -561,4 +557,5 @@ Dưới đây là mã nguồn của các tệp layout XML mặc định được
     </LinearLayout>
 </androidx.cardview.widget.CardView>
 ```
-Vui lòng kiểm tra lại đường dẫn và nội dung.
+
+**Lưu ý**: Vui lòng kiểm tra lại đường dẫn và nội dung tài nguyên (drawable, string, layout) để đảm bảo tính chính xác khi tích hợp.
