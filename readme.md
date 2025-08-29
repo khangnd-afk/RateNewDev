@@ -189,13 +189,27 @@ object RateUtils {
         onReviewInApp: ((isSuccess: Boolean, message: String) -> Unit)? = null,
     ): RateCallback {
         return object : RateCallback {
-            override fun onRate(star: Int, isSubmit: Boolean) {
+             override fun onRate(star: Int, isSubmit: Boolean) {
                 Log.d("RATE_CONFIG", "onRate: star=$star, isSubmit=$isSubmit")
+                if (isSubmit) {
+//                    Tracking.logParams("hit_submit_dialog_send_rate") {
+//                        param("star", count.toString())
+//                    }
+                }
                 onRate?.invoke(star, isSubmit)
             }
 
             override fun onFeedBack(count: Int, message: String, text: String, isSubmit: Boolean) {
                 Log.d("RATE_CONFIG", "onFeedBack: message=$message, text=$text, isSubmit=$isSubmit")
+                if (isSubmit) {
+//                    Tracking.logParams("hit_submit_dialog_feedback") {
+//                        param("count", count.toString())
+//                        param("feedback_reason", message)
+//                        param("original_feedback", text)
+//                        param("device", RateUtils.getDeviceInfo())
+//                        param("country", Locale.getDefault().country)
+//                    }
+                }
                 onFeedback?.invoke(message, text, isSubmit)
             }
 
