@@ -36,7 +36,7 @@ object RateUtils {
         }
     }
 
-    fun  getRateOptions(
+    fun getRateOptions(
         messages: List<Int>,
         previews: List<Int>,
         starFullDf: Int,

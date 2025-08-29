@@ -14,7 +14,7 @@ object RateManager {
     // --- Config ---
     private var _context: WeakReference<Context>? = null
     internal val context: Context get() = _context?.get()!!
-    private var enable: Boolean = false
+    var idEnable: Boolean = false
     internal lateinit var config: RateConfig
 
     var supportEmail: String = ""
@@ -47,7 +47,7 @@ object RateManager {
         runCatching {
             this._context = WeakReference(context)
             if (isInit || !enable) return
-            this.enable = true
+            this.idEnable = enable
             this.config = customConfig
             this.isDebuggable = isDebuggable
             this.appName = customConfig.appName
@@ -115,7 +115,7 @@ object RateManager {
     }
 
     fun canShowNormal(): Boolean {
-        if (!enable) return false
+        if (!idEnable) return false
 
         val sessionCount = RatePrefs.getSession(context)
         val lastShowTime = RatePrefs.getLastShowTime(context)
@@ -211,7 +211,7 @@ object RateManager {
         runCatching {
             RatePrefs.clearAll(context)
             isInit = false
-            init(context, enable, config)
+            init(context, idEnable, config)
         }
     }
 
